@@ -1,8 +1,5 @@
 package com.example.speedyserve.fakedata
 
-import com.example.speedyserve.frontend.models.Canteen
-import com.example.speedyserve.frontend.models.Dish
-
 //class fakeDataSource {
 //
 //    val canteen=listOf<Canteen>(

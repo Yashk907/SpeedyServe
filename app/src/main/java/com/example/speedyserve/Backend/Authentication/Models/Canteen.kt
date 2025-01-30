@@ -1,6 +1,5 @@
-package com.example.speedyserve.frontend.models
+package com.example.speedyserve.Backend.Authentication.Models
 
-import androidx.compose.runtime.ComposableInferredTarget
 import kotlinx.serialization.Serializable
 
 @Serializable

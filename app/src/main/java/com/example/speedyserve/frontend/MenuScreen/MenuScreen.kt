@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Square
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
@@ -34,6 +36,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,24 +49,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.speedyserve.Backend.Authentication.Models.Dish
+import com.example.speedyserve.Backend.Authentication.Models.OrderDish
 import com.example.speedyserve.R
+import com.example.speedyserve.frontend.MenuScreen.MenuScreenActions
+import com.example.speedyserve.frontend.MenuScreen.MenuScreenViewModel
 
 @Preview(showSystemUi = true)
 @Composable
 fun MenuScreen(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Column {
+    val viewmodel: MenuScreenViewModel = hiltViewModel()
+    val list=viewmodel.Menu.collectAsState()
+    LazyColumn {
+        item{
             Topbar("Menu", onback = {})
-            LazyColumn {
-                item{
-                    BodyPartMenuScreen()
-                }
-                item{
-                    MenuCard()
-                }
+        }
+        item{
+            BodyPartMenuScreen()
+        }
+        if(list.value.isNotEmpty()){
+            items(list.value){
+                    item->
+                MenuCard(item,
+                    viewmodel)
             }
         }
+
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,7 +150,9 @@ private fun BodyPartMenuScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun MenuCard( modifier: Modifier = Modifier) {
+fun MenuCard(item : Dish,
+             viewModel: MenuScreenViewModel,
+             modifier: Modifier = Modifier) {
     Card (shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.elevatedCardElevation(5.dp),
         colors = CardDefaults.cardColors(Color.White),
@@ -148,7 +164,7 @@ fun MenuCard( modifier: Modifier = Modifier) {
                 .fillMaxWidth(0.5f)
                 .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 8.dp)){
 //                if(dishItem.Nonveg) {
-                    Image(painter = painterResource(id = R.drawable.ic_launcher_background),
+                    Image(imageVector = Icons.Default.Square,
                         contentDescription = "",
                         modifier = Modifier.size(20.dp))
 //                }else{
@@ -157,7 +173,7 @@ fun MenuCard( modifier: Modifier = Modifier) {
 //                        modifier = Modifier.size(20.dp))
 //                }
 
-                Text(text = "dish",
+                Text(text = item.name,
                     fontSize = 20.sp,
 //                    fontFamily = FontFamily(Font(R.font.cabin_semibold)),
                     modifier = Modifier.padding(vertical = 5.dp)
@@ -169,9 +185,9 @@ fun MenuCard( modifier: Modifier = Modifier) {
                             modifier=Modifier.size(10.dp))
                     }
                 }
-                Text(text = "200",
+                Text(text = item.price,
                     modifier = Modifier.padding(bottom = 5.dp))
-                Text(text = "description",
+                Text(text = item.description,
 //                    fontFamily = FontFamily(Font(R.font.cabin_med)),
                     modifier = Modifier.padding(bottom = 5.dp)
                 )
@@ -197,11 +213,14 @@ fun MenuCard( modifier: Modifier = Modifier) {
                 }
                 OutlinedButton(
                     onClick = {
-//                        viewModel.setOrderedScreen(dishItem)
-//                        viewModel.setPopUpScreen()
+                        viewModel.onEvent(MenuScreenActions.addDish(OrderDish(
+                            foodId = item._id,
+                            price = item.price
+                        )))
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
+
                     Text(text = "Add",
                     )
                 }

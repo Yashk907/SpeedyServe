@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.speedyserve.Backend.Authentication.Api.AuthApi
 import com.example.speedyserve.Backend.Authentication.Repo.AuthRepoImp
+import com.example.speedyserve.Backend.Authentication.Repo.CanteenRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,13 +17,13 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class networkModule {
+object networkModule {
 
     @Provides
     @Singleton
     fun provideAuthApi() : AuthApi{
         return Retrofit.Builder()
-            .baseUrl("http://192.168.67.50:3000")
+            .baseUrl("http://192.168.1.30:3000")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create()
@@ -39,6 +40,12 @@ class networkModule {
     @Singleton
     fun provideRepo(authApi: AuthApi,preferences: SharedPreferences) : AuthRepoImp{
         return AuthRepoImp(authApi,preferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCanteenRpo(authApi: AuthApi) : CanteenRepoImpl{
+        return CanteenRepoImpl(authApi)
     }
 
 }

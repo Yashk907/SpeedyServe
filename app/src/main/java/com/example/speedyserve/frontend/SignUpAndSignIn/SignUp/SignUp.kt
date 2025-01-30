@@ -1,45 +1,44 @@
-package com.example.speedyserve.frontend.SignUpAndSignIn
+package com.example.speedyserve.frontend.SignUpAndSignIn.SignUp
 
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key.Companion.R
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.speedyserve.frontend.SignUpAndSignIn.AuthUiEvent
+import com.example.speedyserve.frontend.SignUpAndSignIn.AuthViewmodel
+import com.example.speedyserve.frontend.SignUpAndSignIn.RoundedTextField
 
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier ,
-                 viewmodel: AuthViewmodel= hiltViewModel(),
+fun SignUpScreen(modifier: Modifier = Modifier,
+                 viewmodel: AuthViewmodel = hiltViewModel(),
+                 onSignInClick : ()-> Unit,
 //                 navController: NavController
 ){
 
@@ -50,43 +49,48 @@ fun SignUpScreen(modifier: Modifier = Modifier ,
         // verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally)
     {
-        Spacer(modifier = Modifier.height(90.dp))
+        Spacer(modifier = Modifier.height(50.dp))
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Welcome to" , fontSize = 14.sp  , fontWeight = FontWeight.SemiBold)
             Text(text = "SpeedyServe" , fontSize = 32.sp , color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 12.dp))
         }
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         Text("SignUp" , fontSize = 18.sp , fontWeight = FontWeight.Bold ,
-            modifier = Modifier.padding(start = 38.dp, end = 286.dp)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+                .padding(0.dp)
         )
         Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.signUpUsername ,
-            onValueChange = {onevent(AuthUiEvent.SignUpUsernameChanged(it))}
-            , placeHolderText = "Username"
-            , singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp) ,
-            isPasswordTextField = false )
-        Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.email ,
-            onValueChange = {onevent(AuthUiEvent.SignUpEmail(it))}
-            , placeHolderText = "Email"
-            , singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp)
-            , isPasswordTextField = false )
-        Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.phoneNumber ,
-            onValueChange = {onevent(AuthUiEvent.SignUpMobileNum(it))}
-            , placeHolderText = "Phone no."
-            , singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp)
-            , isPasswordTextField = false )
-        Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.signUpPassword ,
-            onValueChange = {onevent(AuthUiEvent.SignUpPasswordChanged(it))} ,
-            placeHolderText = "Password" ,
+        RoundedTextField(
+            value = state.signUpUsername,
+            onValueChange = { onevent(AuthUiEvent.SignUpUsernameChanged(it)) },
+            placeHolderText = "Username",
             singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp) ,
-            isPasswordTextField = true )
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = false)
+        Spacer(modifier = Modifier.height(25.dp))
+        RoundedTextField(
+            value = state.email,
+            onValueChange = { onevent(AuthUiEvent.SignUpEmail(it)) },
+            placeHolderText = "Email",
+            singleLine = true,
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = false)
+        Spacer(modifier = Modifier.height(25.dp))
+        RoundedTextField(
+            value = state.phoneNumber,
+            onValueChange = { onevent(AuthUiEvent.SignUpMobileNum(it)) },
+            placeHolderText = "Phone no.",
+            singleLine = true,
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = false)
+        Spacer(modifier = Modifier.height(25.dp))
+        RoundedTextField(
+            value = state.signUpPassword,
+            onValueChange = { onevent(AuthUiEvent.SignUpPasswordChanged(it)) },
+            placeHolderText = "Password",
+            singleLine = true,
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = true)
         Spacer(modifier = Modifier.height(25.dp))
         Button(onClick = {
             onevent(AuthUiEvent.SignUp)
@@ -94,7 +98,7 @@ fun SignUpScreen(modifier: Modifier = Modifier ,
             modifier = Modifier.fillMaxWidth().height(50.dp).padding(start = 40.dp , end = 40.dp).background(
                 brush = Brush.radialGradient(
                     colors = listOf(Color(0xFFFF9800), Color(0xFF995B00)),
-                    center = androidx.compose.ui.geometry.Offset(0f, 0f), // Gradient center
+                    center = Offset(0f, 0f), // Gradient center
                     radius = 400f // Radius of the gradient
                 ),
                 shape = RoundedCornerShape(12.dp) // Rounded corners
@@ -110,8 +114,19 @@ fun SignUpScreen(modifier: Modifier = Modifier ,
                 ) )
         }
         Spacer(modifier = Modifier.height(25.dp))
-        Text("Already have an account? Login" ,
-            modifier = Modifier.clickable { } , fontSize = 14.sp  , fontWeight = FontWeight.Medium , color = Color(0xFFFF9800))
+        Row {  Text("Already have an account? Login" ,
+            modifier = Modifier.align(Alignment.CenterVertically) ,
+            fontSize = 14.sp  ,
+            fontWeight = FontWeight.Medium ,
+            color = Color(0xFFFF9800))
+
+            IconButton(onClick = onSignInClick) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt,
+                    "icon right",
+                    modifier= Modifier.align(Alignment.CenterVertically))
+            }
+        }
+
     }
 }
 
