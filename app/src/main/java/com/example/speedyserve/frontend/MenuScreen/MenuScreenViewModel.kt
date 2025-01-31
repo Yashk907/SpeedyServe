@@ -15,73 +15,69 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MenuScreenViewModel @Inject constructor(private val repoImpl: CanteenRepoImpl,
-    private val savedStateHandle: SavedStateHandle): ViewModel() {
+class MenuScreenViewModel @Inject constructor(
+    private val repoImpl: CanteenRepoImpl,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
+    private val _orderedDishList = mutableListOf<OrderDish>()
+    val ordereddishList = _orderedDishList
 
-    private val _orderList = mutableListOf<OrderDish>()
-    val orderList = _orderList
+    private val _menu = MutableStateFlow<List<Dish>>(emptyList())
+    val menu = _menu
 
-    private val currentDishId = mutableStateOf("")
-     val isLoading = mutableStateOf(true)
+    val isLoading = mutableStateOf(true)
+    val isDishListEmpty = mutableStateOf(true)
 
-
-    private val _Menu = MutableStateFlow<List<Dish>>(emptyList<Dish>())
-    val Menu = _Menu
-
-
-
-init {
-    val _id =savedStateHandle.get<String>("id")
-    Log.d("check",_id.toString())
-if(_id!=null){
-    onEvent(MenuScreenActions.fetchMenu(_id))
-    isLoading.value=true
-}
-}
-
-
-    fun onEvent(event : MenuScreenActions){
-        when(event){
-            is MenuScreenActions.fetchMenu -> {
-                viewModelScope.launch{
-                    val fetchMenu = repoImpl.getDishes(event._id).dishes
-                    if(fetchMenu.isNotEmpty()){
-                        _Menu.value=fetchMenu
-                    }
-                }
-
-            }
-
-            is MenuScreenActions.IncreaseQuantity -> {
-                for(i in 0..<orderList.size){
-                    if(currentDishId.value==orderList[i].foodId){
-                        _orderList[i].quantity.inc()
-                    }
-                }
-            }
-
-            is MenuScreenActions.DecreaseQuantity -> {for(i in 0..<orderList.size){
-                if(currentDishId.value==orderList[i].foodId){
-                    if(_orderList[i].quantity.dec()>=0){
-                        _orderList[i].quantity.dec()
-                    }
-                }
-            }
-            }
-            is MenuScreenActions.addDish -> {
-                currentDishId.value=event.Dish.foodId
-                viewModelScope.launch{
-                    _orderList.add(OrderDish(
-                        event.Dish.foodId,
-                        event.Dish.quantity.inc(),
-                        event.Dish.price
-                    ))
-                }
-
-            }
+    init {
+        savedStateHandle.get<String>("id")?.let { canteenId ->
+            Log.d("check", canteenId)
+            onEvent(MenuScreenActions.fetchMenu(canteenId))
         }
     }
 
-}
+    fun onEvent(event: MenuScreenActions) {
+        when (event) {
+            is MenuScreenActions.fetchMenu -> {
 
+                viewModelScope.launch {
+                    isLoading.value = true
+                    val fetchedMenu = repoImpl.getDishes(event._id).dishes
+                    _menu.value = fetchedMenu
+                    isLoading.value = false
+
+                }
+            }
+
+            is MenuScreenActions.addDish -> {
+                val existingDish = _orderedDishList.find { it.foodId == event.Dish._id }
+
+                if (existingDish != null) {
+                    // Increase quantity of existing dish
+                    val index = _orderedDishList.indexOf(existingDish)
+                    _orderedDishList[index] = existingDish.copy(quantity = existingDish.quantity + 1)
+                } else {
+                    // Add new dish to the list
+                    _orderedDishList.add(
+                        OrderDish(
+                            dishname = event.Dish.name,
+                            quantity = 1,
+                            foodId = event.Dish._id,
+                            price = event.Dish.price,
+                            isInCart = true
+                        )
+                    )
+
+                }
+                isDishListEmpty.value = _orderedDishList.isEmpty()
+
+                Log.d("clicked", "addclick")
+                Log.d("cheklost", ordereddishList.toString())
+
+                viewModelScope.launch{
+                    repoImpl.updateList(_orderedDishList)
+                }
+            }
+        }
+    }
+}

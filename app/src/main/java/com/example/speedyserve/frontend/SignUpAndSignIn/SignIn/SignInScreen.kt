@@ -1,5 +1,6 @@
 package com.example.speedyserve.frontend.SignUpAndSignIn.SignIn
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,99 +36,110 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.speedyserve.frontend.Navigation.Screens
 import com.example.speedyserve.frontend.SignUpAndSignIn.AuthUiEvent
-import com.example.speedyserve.frontend.SignUpAndSignIn.AuthViewmodel
+import com.example.speedyserve.frontend.SignUpAndSignIn.AuthViewModel
 import com.example.speedyserve.frontend.SignUpAndSignIn.RoundedTextField
 
 
 @Composable
-fun SignInScreen(modifier: Modifier = Modifier ,
-                 viewmodel: AuthViewmodel= hiltViewModel(),
-                 onSignInClick : ()-> Unit,
-                 onSkipClick : ()-> Unit
-){
+fun SignInScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel(),
+    onLoggedin : NavHostController,  // Add NavController for navigation
+    onSignUpClick: () -> Unit,
+    onSkipClick: () -> Unit
+) {
+    val onevent = viewModel::onEvent
+    val state by remember { mutableStateOf(viewModel.state) }
+    val isLoggedIn by viewModel._isLoggedIn.collectAsState()  // Observe login state
+    val loggedIn by remember { mutableStateOf(false) }
+    // Navigate when login is successful
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            Log.d("loggedin","true")
+            onLoggedin.navigate(route = "${Screens.CANTEENSCREEN}")
+        }
+    }
 
-    val onevent =viewmodel::onEvent
-    val state=viewmodel.state
     Column(
         modifier = modifier.fillMaxSize().background(color = Color(0xFFECEFF1)),
-        // verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally)
-    {
-        TextButton(onSkipClick, modifier = Modifier.align(Alignment.Start)
-            .padding(10.dp)) {
-            Text("Skip",
-                fontSize = 19.sp  , fontWeight = FontWeight.SemiBold,
-                modifier= Modifier
-                    .padding(0.dp)
-                    )
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TextButton(onSkipClick, modifier = Modifier.align(Alignment.Start).padding(10.dp)) {
+            Text(
+                "Skip",
+                fontSize = 19.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(0.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(90.dp))
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Welcome to" , fontSize = 14.sp  , fontWeight = FontWeight.SemiBold)
-            Text(text = "SpeedyServe" , fontSize = 32.sp , color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 12.dp))
+            Text(text = "Welcome to", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = "SpeedyServe",
+                fontSize = 32.sp,
+                color = Color(0xFFFF9800),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 12.dp)
+            )
         }
+
         Spacer(modifier = Modifier.height(50.dp))
-        Text("SignIn" ,
-            fontSize = 18.sp ,
-            fontWeight = FontWeight.Bold ,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-                .padding(start = 0.dp)
+        Text(
+            "SignIn",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(start = 0.dp)
         )
         Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.signInUsername ,
-            onValueChange = {onevent(AuthUiEvent.SignInUsernameChanged(it))}
-            , placeHolderText = "Username"
-            , singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp) ,
-            isPasswordTextField = false )
 
-        Spacer(modifier = Modifier.height(25.dp))
-        RoundedTextField(value = state.signInPassword ,
-            onValueChange = {onevent(AuthUiEvent.SignInPasswordChanged(it))} ,
-            placeHolderText = "Password" ,
+        RoundedTextField(
+            value = state.value.signInUsername,
+            onValueChange = { onevent(AuthUiEvent.SignInUsernameChanged(it)) },
+            placeHolderText = "Username",
             singleLine = true,
-            modifier = Modifier.padding(start = 40.dp , end = 40.dp) ,
-            isPasswordTextField = true )
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = false
+        )
+
         Spacer(modifier = Modifier.height(25.dp))
-        Button(onClick = {
-            onevent(AuthUiEvent.SignIn)
-        },
-            modifier = Modifier.fillMaxWidth().height(50.dp).padding(start = 40.dp , end = 40.dp).background(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFFFF9800), Color(0xFF995B00)),
-                    center = androidx.compose.ui.geometry.Offset(0f, 0f), // Gradient center
-                    radius = 400f // Radius of the gradient
-                ),
-                shape = RoundedCornerShape(12.dp) // Rounded corners
-            ),
-            colors = ButtonDefaults.buttonColors(Color.Transparent),
+
+        RoundedTextField(
+            value = state.value.signInPassword,
+            onValueChange = { onevent(AuthUiEvent.SignInPasswordChanged(it)) },
+            placeHolderText = "Password",
+            singleLine = true,
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp),
+            isPasswordTextField = true
+        )
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Button(
+            onClick = { onevent(AuthUiEvent.SignIn) },
+            modifier = Modifier.fillMaxWidth().height(50.dp).padding(start = 40.dp, end = 40.dp),
+            colors = ButtonDefaults.buttonColors(Color(0xFFFF9800))
         ) {
-            Text(
-                text = "SignIn",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFFFFFF),
-                ) )
+            Text(text = "SignIn", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
+
         Spacer(modifier = Modifier.height(25.dp))
-        Row {Text("Not register ? Sign up first" ,
-//            modifier = Modifier.clickable {onSignInClick }
 
-            fontSize = 14.sp  ,
-            fontWeight = FontWeight.Medium ,
-            color = Color(0xFFFF9800),
-            modifier= Modifier.align(Alignment.CenterVertically))
-            IconButton(
-                onClick = onSignInClick,
-             modifier = Modifier.align(Alignment.CenterVertically))
-         {
-             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt,
-                 "icons",
-                 modifier= Modifier.align(Alignment.CenterVertically))
-         }}
-
+        Row {
+            Text(
+                "Not registered? Sign up first",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFFF9800),
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            IconButton(onClick = onSignUpClick, modifier = Modifier.align(Alignment.CenterVertically)) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowRightAlt, "Sign Up")
+            }
+        }
     }
 }

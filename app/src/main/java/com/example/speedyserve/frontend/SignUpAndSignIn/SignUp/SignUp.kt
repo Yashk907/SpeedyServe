@@ -32,12 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.speedyserve.frontend.SignUpAndSignIn.AuthUiEvent
-import com.example.speedyserve.frontend.SignUpAndSignIn.AuthViewmodel
+import com.example.speedyserve.frontend.SignUpAndSignIn.AuthViewModel
 import com.example.speedyserve.frontend.SignUpAndSignIn.RoundedTextField
 
 @Composable
 fun SignUpScreen(modifier: Modifier = Modifier,
-                 viewmodel: AuthViewmodel = hiltViewModel(),
+                 viewmodel: AuthViewModel = hiltViewModel(),
                  onSignInClick : ()-> Unit,
 //                 navController: NavController
 ){
@@ -61,7 +61,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
         )
         Spacer(modifier = Modifier.height(25.dp))
         RoundedTextField(
-            value = state.signUpUsername,
+            value = state.value.signUpUsername,
             onValueChange = { onevent(AuthUiEvent.SignUpUsernameChanged(it)) },
             placeHolderText = "Username",
             singleLine = true,
@@ -69,7 +69,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             isPasswordTextField = false)
         Spacer(modifier = Modifier.height(25.dp))
         RoundedTextField(
-            value = state.email,
+            value = state.value.email,
             onValueChange = { onevent(AuthUiEvent.SignUpEmail(it)) },
             placeHolderText = "Email",
             singleLine = true,
@@ -77,7 +77,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             isPasswordTextField = false)
         Spacer(modifier = Modifier.height(25.dp))
         RoundedTextField(
-            value = state.phoneNumber,
+            value = state.value.phoneNumber,
             onValueChange = { onevent(AuthUiEvent.SignUpMobileNum(it)) },
             placeHolderText = "Phone no.",
             singleLine = true,
@@ -85,7 +85,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             isPasswordTextField = false)
         Spacer(modifier = Modifier.height(25.dp))
         RoundedTextField(
-            value = state.signUpPassword,
+            value = state.value.signUpPassword,
             onValueChange = { onevent(AuthUiEvent.SignUpPasswordChanged(it)) },
             placeHolderText = "Password",
             singleLine = true,

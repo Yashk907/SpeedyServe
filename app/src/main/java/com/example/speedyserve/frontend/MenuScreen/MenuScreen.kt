@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,12 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,10 +32,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -50,33 +55,59 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.speedyserve.Backend.Authentication.Models.Dish
 import com.example.speedyserve.Backend.Authentication.Models.OrderDish
 import com.example.speedyserve.R
 import com.example.speedyserve.frontend.MenuScreen.MenuScreenActions
 import com.example.speedyserve.frontend.MenuScreen.MenuScreenViewModel
+import com.example.speedyserve.frontend.Navigation.Screens
+import kotlinx.coroutines.flow.toList
 
-@Preview(showSystemUi = true)
 @Composable
-fun MenuScreen(modifier: Modifier = Modifier) {
+fun MenuScreen(navController: NavHostController,
+               modifier: Modifier = Modifier) {
     val viewmodel: MenuScreenViewModel = hiltViewModel()
-    val list=viewmodel.Menu.collectAsState()
-    LazyColumn {
-        item{
-            Topbar("Menu", onback = {})
-        }
-        item{
-            BodyPartMenuScreen()
-        }
-        if(list.value.isNotEmpty()){
-            items(list.value){
-                    item->
-                MenuCard(item,
-                    viewmodel)
+    val list=viewmodel.menu.collectAsState()
+    Log.d("checkTest",viewmodel.ordereddishList.toString())
+
+        Box (modifier= Modifier){
+            LazyColumn (modifier = Modifier.fillMaxSize()
+                .align(Alignment.TopCenter)){
+                item{
+                    Topbar("Menu",{},modifier.windowInsetsPadding(WindowInsets(0.dp)))
+                }
+                item{
+                    BodyPartMenuScreen()
+                }
+                if(list.value.isNotEmpty()){
+                    items(list.value){
+                            item->
+                        MenuCard(item,
+                            viewmodel)
+                    }
+                }
+
             }
-        }
+            Log.d("clicked",viewmodel.ordereddishList.isNotEmpty().toString())
+            if(viewmodel.isDishListEmpty.value==false){
+                Log.d("clicked","fab clicked")
+                FloatingActionButton(
+                    onClick = {navController.navigate("${Screens.CARTSCREEN}")},
+                    modifier= Modifier.align(Alignment.BottomEnd)
+                        .padding(horizontal = 30.dp, vertical = 20.dp)
+
+                ) {
+                    Text(text = "Go to Cart",
+                        modifier= Modifier.padding(10.dp))
+                }
+            }
 
     }
+
+
+
 
 }
 
@@ -112,9 +143,9 @@ fun Topbar(title : String,onback : ()->Unit,modifier: Modifier = Modifier) {
 
             }
         },
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(0.dp)
     )
 }
 
@@ -164,7 +195,7 @@ fun MenuCard(item : Dish,
                 .fillMaxWidth(0.5f)
                 .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 8.dp)){
 //                if(dishItem.Nonveg) {
-                    Image(imageVector = Icons.Default.Square,
+                    Image(painterResource(R.drawable.veg),
                         contentDescription = "",
                         modifier = Modifier.size(20.dp))
 //                }else{
@@ -202,7 +233,7 @@ fun MenuCard(item : Dish,
                     ,
 //                            colors = CardDefaults.cardColors(Color.White)
                 ){
-                    Image(painter =painterResource(R.drawable.frog),
+                    Image(painter =painterResource(R.drawable.dish),
 //                        rememberAsyncImagePainter(model = dishItem.img_link),
                         contentDescription ="",
                         contentScale = ContentScale.Crop,
@@ -213,14 +244,10 @@ fun MenuCard(item : Dish,
                 }
                 OutlinedButton(
                     onClick = {
-                        viewModel.onEvent(MenuScreenActions.addDish(OrderDish(
-                            foodId = item._id,
-                            price = item.price
-                        )))
+                        viewModel.onEvent(MenuScreenActions.addDish(item))
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-
                     Text(text = "Add",
                     )
                 }

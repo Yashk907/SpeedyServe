@@ -1,5 +1,8 @@
 package com.example.speedyserve.Backend.Authentication.Models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class TokenResponse(
-    val token : String
+    val _id : String
 )

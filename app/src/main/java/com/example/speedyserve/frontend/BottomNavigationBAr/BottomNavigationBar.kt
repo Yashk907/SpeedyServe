@@ -4,10 +4,14 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Dining
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Dining
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Public
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -39,22 +43,22 @@ fun BottomNavigationBar(viewmodel: BottomBarViewModel,
     val currentScreen = viewmodel.currentScreen.value
     val navigationItem=listOf(
         DrawerItem(
-            string = "Recipes",
+            string = "Canteens",
             ScreenName = "${Screens.CANTEENSCREEN}",
             selectedicon = Icons.Filled.Dining,
             unselectedicon = Icons.Outlined.Dining,
         ),
         DrawerItem(
-            string = "Add",
+            string = "Cart",
             ScreenName = "${Screens.CARTSCREEN}",
-            selectedicon = Icons.Filled.AddCircle,
-            unselectedicon = Icons.Outlined.AddCircleOutline
+            selectedicon = Icons.Filled.ShoppingCart,
+            unselectedicon = Icons.Outlined.ShoppingCart
         ),
         DrawerItem(
-            string = "Social",
+            string = "Profile",
             ScreenName = "${Screens.PROFILESCREEN}",
-            selectedicon = Icons.Filled.Public,
-            unselectedicon = Icons.Outlined.Public
+            selectedicon = Icons.Filled.Person,
+            unselectedicon = Icons.Outlined.Person
         ),
 
         )
